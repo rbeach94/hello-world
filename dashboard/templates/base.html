@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Production Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="{% static 'orders/dashboard.css' %}" />
+  </head>
+  <body>
+    <nav class="container-fluid">
+      <ul>
+        <li><strong>Production Dashboard</strong></li>
+      </ul>
+      <ul>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'orders:list' %}">Orders</a></li>
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'logout' %}">Log out</a></li>
+        {% else %}
+        <li><a href="{% url 'login' %}">Log in</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <main class="container">
+      {% for message in messages %}
+      <article class="message {{ message.tags }}">{{ message }}</article>
+      {% endfor %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

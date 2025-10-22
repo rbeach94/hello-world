@@ -1,0 +1,33 @@
+body {
+  background: #f6f6f6;
+}
+
+nav {
+  background: #16213e;
+  color: #fff;
+}
+
+nav a {
+  color: #fff;
+}
+
+.order-table tbody tr.status-complete {
+  background: #e8f5e9;
+}
+
+.order-table tbody tr.status-in_production {
+  background: #fff8e1;
+}
+
+.order-table tbody tr.status-on_hold {
+  background: #ffebee;
+}
+
+.order-table td, .order-table th {
+  vertical-align: middle;
+}
+
+.muted {
+  color: #666;
+  font-style: italic;
+}
