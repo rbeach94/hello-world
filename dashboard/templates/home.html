@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<section>
+  <h1>Welcome to the Production Dashboard</h1>
+  <p>This internal tool provides live visibility into the General Orders pipeline.</p>
+  <ul>
+    <li>Track production status and due dates</li>
+    <li>Assign work to team members</li>
+    <li>Synchronise data with the "General Orders" Google Sheet</li>
+  </ul>
+  <p><a role="button" href="{% url 'orders:list' %}">View orders</a></p>
+</section>
+{% endblock %}

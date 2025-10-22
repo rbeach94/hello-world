@@ -1,0 +1,7 @@
+Django>=4.2,<5.0
+python-dotenv>=1.0
+# Optional dependency for Google Sheets synchronisation
+google-api-python-client>=2.125.0
+google-auth>=2.27.0
+gunicorn>=21.2
+PyMySQL>=1.1.0

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Order {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section>
+  <header>
+    <h1>Order {{ order.order_number }}</h1>
+    <p>Update production details and assignment.</p>
+  </header>
+
+  <article>
+    <form method="post" action="{% url 'orders:update' order.pk %}">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="grid">
+        <label>Customer {{ form.customer_name }}</label>
+        <label>Quantity {{ form.quantity }}</label>
+        <label>Due date {{ form.due_date }}</label>
+        <label>Status {{ form.production_status }}</label>
+        <label>Decoration {{ form.decoration_type }}</label>
+        <label>Assigned staff {{ form.assigned_staff }}</label>
+      </div>
+      <label>Description {{ form.description }}</label>
+      <label>Preview image URL {{ form.preview_image_url }}</label>
+      <footer>
+        <button type="submit">Save changes</button>
+      </footer>
+    </form>
+  </article>
+
+  {% if order.preview_image_url %}
+  <section class="order-preview">
+    <h2>Design Preview</h2>
+    <img src="{{ order.preview_image_url }}" alt="Preview for order {{ order.order_number }}" />
+  </section>
+  {% endif %}
+
+  <section class="order-garments">
+    <h2>Garments</h2>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Colour</th>
+          <th>Size</th>
+          <th>Qty</th>
+          <th>Status</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for garment in garments %}
+        <tr>
+          <td>{{ garment.name }}</td>
+          <td>{{ garment.colour|default:"-" }}</td>
+          <td>{{ garment.size|default:"-" }}</td>
+          <td>{{ garment.quantity }}</td>
+          <td>{{ garment.get_status_display }}</td>
+          <td>{{ garment.notes|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="muted">No garments recorded for this order yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Audit trail</h2>
+    <ul>
+      {% for entry in order.audit_trail.all %}
+      <li>
+        <strong>{{ entry.created_at|date:"d M Y H:i" }}</strong>:
+        {% if entry.user %}
+          {{ entry.user.get_full_name|default:entry.user.username }}
+        {% else %}
+          System
+        {% endif %}
+        changed status from <em>{{ entry.previous_status|default:"n/a" }}</em> to
+        <em>{{ entry.new_status|default:"n/a" }}</em>
+        {% if entry.message %}- {{ entry.message }}{% endif %}
+      </li>
+      {% empty %}
+      <li class="muted">No changes recorded yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</section>
+{% endblock %}
