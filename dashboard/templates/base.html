@@ -16,6 +16,9 @@
       <ul>
         <li><a href="{% url 'home' %}">Home</a></li>
         <li><a href="{% url 'orders:list' %}">Orders</a></li>
+        <li><a href="{% url 'orders:purchasing' %}">Purchasing</a></li>
+        <li><a href="{% url 'orders:stock' %}">Stock</a></li>
+        <li><a href="{% url 'orders:production' %}">Production</a></li>
         {% if user.is_authenticated %}
         <li><a href="{% url 'logout' %}">Log out</a></li>
         {% else %}

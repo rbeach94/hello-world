@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Stock Control{% endblock %}
+
+{% block content %}
+<section>
+  <header>
+    <h1>Awaiting Garments</h1>
+    <p>Orders waiting for garments to arrive. Mark orders as ready once stock is available.</p>
+  </header>
+  <table role="grid" class="order-table">
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Due</th>
+        <th>Garments</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td>{{ order.order_number }}</td>
+        <td>{{ order.customer_name }}</td>
+        <td>
+          {% if order.due_date %}
+            {{ order.due_date|date:"d M Y" }}
+          {% else %}
+            <span class="muted">Not set</span>
+          {% endif %}
+        </td>
+        <td>
+          <ul>
+            {% for garment in order.garments.all %}
+            <li>{{ garment.name }} ({{ garment.quantity }})</li>
+            {% empty %}
+            <li class="muted">No garments listed</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>
+          <form method="post" action="{% url 'orders:stock' %}">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.pk }}" />
+            <button type="submit">Mark Ready</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="muted">No orders currently awaiting garments.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

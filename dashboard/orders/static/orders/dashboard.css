@@ -11,16 +11,20 @@ nav a {
   color: #fff;
 }
 
+.order-table tbody tr.status-pending {
+  background: #fffef2;
+}
+
+.order-table tbody tr.status-awaiting_garments {
+  background: #fff3cd;
+}
+
+.order-table tbody tr.status-ready {
+  background: #e7f5ff;
+}
+
 .order-table tbody tr.status-complete {
   background: #e8f5e9;
-}
-
-.order-table tbody tr.status-in_production {
-  background: #fff8e1;
-}
-
-.order-table tbody tr.status-on_hold {
-  background: #ffebee;
 }
 
 .order-table td, .order-table th {
@@ -30,4 +34,31 @@ nav a {
 .muted {
   color: #666;
   font-style: italic;
+}
+
+.order-preview img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-preview,
+.order-garments {
+  margin: 2rem 0;
+}
+
+.order-garments table {
+  width: 100%;
+}
+
+.order-garments table th,
+.order-garments table td {
+  text-align: left;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: flex-end;
 }

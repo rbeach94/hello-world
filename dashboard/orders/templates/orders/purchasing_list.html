@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Purchasing{% endblock %}
+
+{% block content %}
+<section>
+  <header>
+    <h1>Purchasing Queue</h1>
+    <p>Garments that require ordering are listed below.</p>
+  </header>
+  <table role="grid" class="order-table">
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Garment</th>
+        <th>Colour</th>
+        <th>Size</th>
+        <th>Qty</th>
+        <th>Decoration</th>
+        <th>Due</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for garment in garments %}
+      <tr>
+        <td>{{ garment.order.order_number }}</td>
+        <td>{{ garment.order.customer_name }}</td>
+        <td>{{ garment.name }}</td>
+        <td>{{ garment.colour|default:"-" }}</td>
+        <td>{{ garment.size|default:"-" }}</td>
+        <td>{{ garment.quantity }}</td>
+        <td>{{ garment.order.get_decoration_type_display }}</td>
+        <td>
+          {% if garment.order.due_date %}
+            {{ garment.order.due_date|date:"d M Y" }}
+          {% else %}
+            <span class="muted">Not set</span>
+          {% endif %}
+        </td>
+        <td><a href="{% url 'orders:detail' garment.order.pk %}">View order</a></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="9" class="muted">No garments currently require purchasing.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

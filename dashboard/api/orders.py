@@ -23,16 +23,30 @@ def serialize_order(order: Order) -> dict[str, Any]:
         "quantity": order.quantity,
         "due_date": order.due_date.isoformat() if order.due_date else None,
         "production_status": order.production_status,
+        "decoration_type": order.decoration_type,
+        "preview_image_url": order.preview_image_url,
         "assigned_staff": order.assigned_staff_id,
         "updated_at": order.updated_at.isoformat(),
         "external_reference": order.external_reference,
+        "garments": [
+            {
+                "id": garment.id,
+                "name": garment.name,
+                "colour": garment.colour,
+                "size": garment.size,
+                "quantity": garment.quantity,
+                "status": garment.status,
+                "notes": garment.notes,
+            }
+            for garment in order.garments.all()
+        ],
     }
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class OrderCollectionView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest) -> JsonResponse:
-        queryset = Order.objects.all()
+        queryset = Order.objects.all().prefetch_related("garments")
         status_filter = request.GET.get("status")
         search = request.GET.get("search")
         if status_filter:
@@ -48,6 +62,7 @@ class OrderCollectionView(LoginRequiredMixin, View):
             order = form.save(commit=False)
             order._acting_user = request.user
             order.save()
+            order.refresh_from_db()
             return JsonResponse(serialize_order(order), status=201)
         return JsonResponse({"errors": form.errors}, status=400)
 
@@ -55,17 +70,18 @@ class OrderCollectionView(LoginRequiredMixin, View):
 @method_decorator(csrf_exempt, name="dispatch")
 class OrderDetailView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> JsonResponse:
-        order = get_object_or_404(Order, pk=pk)
+        order = get_object_or_404(Order.objects.prefetch_related("garments"), pk=pk)
         return JsonResponse(serialize_order(order))
 
     def put(self, request: HttpRequest, pk: int) -> JsonResponse:
-        order = get_object_or_404(Order, pk=pk)
+        order = get_object_or_404(Order.objects.prefetch_related("garments"), pk=pk)
         payload = json.loads(request.body or "{}")
         form = OrderUpdateForm(payload, instance=order)
         if form.is_valid():
             order._previous_status = order.production_status
             order._acting_user = request.user
             form.save()
+            order.refresh_from_db()
             return JsonResponse(serialize_order(order))
         return JsonResponse({"errors": form.errors}, status=400)
 

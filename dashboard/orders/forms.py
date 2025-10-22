@@ -26,10 +26,13 @@ class OrderBaseForm(forms.ModelForm):
             "quantity",
             "due_date",
             "production_status",
+            "decoration_type",
+            "preview_image_url",
             "assigned_staff",
         ]
         widgets = {
             "due_date": forms.DateInput(attrs={"type": "date"}),
+            "preview_image_url": forms.URLInput(attrs={"placeholder": "https://"}),
         }
 
 

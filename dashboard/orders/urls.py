@@ -9,6 +9,9 @@ app_name = "orders"
 
 urlpatterns = [
     path("", views.OrderListView.as_view(), name="list"),
+    path("purchasing/", views.PurchasingListView.as_view(), name="purchasing"),
+    path("stock/", views.StockListView.as_view(), name="stock"),
+    path("production/", views.ProductionListView.as_view(), name="production"),
     path("<int:pk>/", views.OrderDetailView.as_view(), name="detail"),
     path("<int:pk>/update/", views.update_order, name="update"),
 

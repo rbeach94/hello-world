@@ -3,6 +3,7 @@
 This Django-based dashboard provides internal tooling for managing "General Orders" at ww.printoften.co.uk. It offers:
 
 - Authentication protected UI for reviewing and updating orders
+- Dedicated purchasing, stock control, and production queues to streamline handoffs
 - REST-style JSON API for CRUD operations on orders
 - Google Sheets synchronisation utilities to keep data aligned with the "General Orders" sheet
 - Audit trail logging whenever order production status changes
@@ -78,3 +79,14 @@ Krystal's cPanel hosting supports Passenger-powered Python applications. The rep
 7. Restart the Python application from the cPanel interface to pick up the new code and environment variables.
 
 Passenger will load `passenger_wsgi.py`, which exposes the Django WSGI application defined in `dashboard/wsgi.py`.
+## Order workflow overview
+
+Orders progress through four statuses inside the dashboard:
+
+1. **Pending** – newly logged work waiting to be actioned.
+2. **Awaiting Garments** – purchasing is sourcing garments for the order.
+3. **Ready** – garments are in stock and production can begin.
+4. **Complete** – work finished and ready for dispatch/collection.
+
+Each order also records its decoration requirement (Embroidery, Print, or Both) and an optional preview image URL that displays on the order detail page. Garments associated with an order can be captured with name, colour, size, quantity, and purchasing status to power the purchasing and stock control views.
+

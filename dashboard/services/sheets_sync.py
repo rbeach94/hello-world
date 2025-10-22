@@ -31,6 +31,8 @@ class SheetOrder:
     production_status: str
     assigned_staff_email: str
     external_reference: str
+    decoration_type: str = ""
+    preview_image_url: str = ""
 
 
 def _get_service():
@@ -51,7 +53,7 @@ def fetch_sheet_rows() -> Iterable[SheetOrder]:
     sheet = service.spreadsheets()
     result = sheet.values().get(
         spreadsheetId=settings.GOOGLE_SHEETS_SPREADSHEET_ID,
-        range=f"{settings.GOOGLE_SHEETS_WORKSHEET_NAME}!A2:H",
+        range=f"{settings.GOOGLE_SHEETS_WORKSHEET_NAME}!A2:J",
     ).execute()
     for row in result.get("values", []):
         yield SheetOrder(
@@ -63,6 +65,8 @@ def fetch_sheet_rows() -> Iterable[SheetOrder]:
             production_status=row[5],
             assigned_staff_email=row[6],
             external_reference=row[7] if len(row) > 7 else "",
+            decoration_type=row[8] if len(row) > 8 else "",
+            preview_image_url=row[9] if len(row) > 9 else "",
         )
 
 
@@ -75,6 +79,34 @@ def _parse_due_date(value: str):
         except ValueError:
             continue
     LOGGER.warning("Unable to parse due date %s", value)
+    return None
+
+
+def _normalise_status(value: str) -> str | None:
+    if not value:
+        return None
+    cleaned = value.strip().lower().replace(" ", "_")
+    for choice, _ in Order.ProductionStatus.choices:
+        if cleaned == choice:
+            return choice
+    for choice, label in Order.ProductionStatus.choices:
+        if cleaned == label.lower().replace(" ", "_"):
+            return choice
+    LOGGER.warning("Unknown status %s from sheet", value)
+    return None
+
+
+def _normalise_decoration(value: str) -> str | None:
+    if not value:
+        return None
+    cleaned = value.strip().lower().replace(" ", "_")
+    for choice, _ in Order.DecorationType.choices:
+        if cleaned == choice:
+            return choice
+    for choice, label in Order.DecorationType.choices:
+        if cleaned == label.lower().replace(" ", "_"):
+            return choice
+    LOGGER.warning("Unknown decoration type %s from sheet", value)
     return None
 
 
@@ -99,11 +131,17 @@ def import_orders_from_sheet() -> int:
             order.description = record.description
             order.quantity = record.quantity
         order.external_reference = record.external_reference
-        if record.production_status:
-            order.production_status = record.production_status
+        status = _normalise_status(record.production_status)
+        if status:
+            order.production_status = status
         due_date = _parse_due_date(record.due_date)
         if due_date:
             order.due_date = due_date
+        decoration = _normalise_decoration(record.decoration_type)
+        if decoration:
+            order.decoration_type = decoration
+        if record.preview_image_url:
+            order.preview_image_url = record.preview_image_url
         if record.assigned_staff_email:
             try:
                 order.assigned_staff = User.objects.get(email__iexact=record.assigned_staff_email)
@@ -132,6 +170,8 @@ def export_order_to_sheet(order: Order) -> None:
                 order.production_status,
                 order.assigned_staff.email if order.assigned_staff else "",
                 order.external_reference,
+                order.decoration_type,
+                order.preview_image_url,
             ]
         ]
     }
